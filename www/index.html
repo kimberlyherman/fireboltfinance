@@ -1,0 +1,328 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firebolt Finance</title>
+
+  <!--link rel="stylesheet" href="css/font.css"-->
+  <!--link rel="stylesheet" href="css/main.css"-->
+
+  <!-- detects which functionality browser supports-->
+  <!--script src="js/vendor/modernizr.js"></script-->
+  <link rel="stylesheet" href="css/bulma/css/bulma.css">
+  <link rel="stylesheet" href="css/bulma/css/bulma-rtl.css">
+  <!--script src="js/IntlTableSort-master/src/IntlTableSort.js"></script>
+  <script src="js/IntlTableSort-master/src/IntlTableSort.Number.js"></script-->
+  <style type='text/css'>
+	.table {
+
+		background-color: transparent;
+	}
+	#debts-table {
+	  	color: white;
+	}
+
+  </style>
+
+</head>
+
+<script type='text/javascript'>
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2
+})
+
+function populateBills (billsResp) {
+	var docFrag = document.createDocumentFragment();
+	
+	bills = billsResp['bills'];
+	billsTotalFirst = 0;
+	billsTotalFifteenth = 0;
+	billsTotal = 0;
+
+	INCOME = 5386.23;
+	INCOMEFIRST = 2809.23; 
+	INCOMEFIFTEENTH = 2577.01;
+
+	for(let billName in bills) {
+
+		var tr = document.createElement('tr');
+		var col1 = document.createElement('td');
+		var col2 = document.createElement('td');
+		var col3 = document.createElement('td');
+		var col4 = document.createElement('td');
+		var col5 = document.createElement('td');
+
+		var billDetails = bills[billName];
+		var billAmount = billDetails[0];
+		//may break for feb or bills due the 31st
+		//autoset anything after 28 to 28.. or only in feb
+		var billDueDate = billDetails[1];
+		var billPaymentAccount = billDetails[2];
+		var billPaymentAuto = billDetails[3];
+
+		col1.innerHTML = billName;
+		col2.innerHTML = billAmount;
+		col3.innerHTML = billDueDate;
+		col4.innerHTML = billPaymentAccount;
+		col5.innerHTML = billPaymentAuto;
+
+		col1.style = 'padding-left: 0;';
+		col2.style = 'padding-left: 0';
+		col3.style = 'padding-left: 0';
+		col4.style = 'padding-left: 0';
+		col5.style = 'padding-left: 0';
+
+		tr.appendChild(col1);
+		tr.appendChild(col2);
+		tr.appendChild(col3);
+		tr.appendChild(col4);
+		tr.appendChild(col5);
+
+		docFrag.appendChild(tr);
+
+		if(billDueDate > 14) {
+			billsTotalFifteenth += billAmount;
+		} else {
+			billsTotalFirst += billAmount;
+		}
+
+		//incomeResp[
+	}
+	billsTotal = billsTotalFirst + billsTotalFifteenth;
+	toBudget = formatter.format(INCOME - billsTotal); 
+	toBudgetFirst = formatter.format(INCOMEFIRST - billsTotalFirst);
+	toBudgetFifteenth = formatter.format(INCOMEFIFTEENTH - billsTotalFifteenth);
+
+	billsTotal = formatter.format(billsTotal);
+	billsTotalFirst = formatter.format(billsTotalFirst);
+	billsTotalFifteenth = formatter.format(billsTotalFifteenth);
+
+	document.getElementById('billsTotal').innerHTML = toBudget; 
+	document.getElementById('billsTotalFirst').innerHTML = toBudgetFirst;
+	document.getElementById('billsTotalFifteenth').innerHTML = toBudgetFifteenth;
+
+	document.getElementById('bills-table-tbody').appendChild(docFrag);
+
+	document.getElementById('bills-total').innerHTML = billsTotal;
+}
+
+function populateDebts (debtsResp) {
+	var docFrag = document.createDocumentFragment();
+	
+	debts = debtsResp['debts'];
+	debtsTotal = debtsResp['debtsTotal'];
+
+	for(let key in debts) {
+
+		var e = document.createElement('tr');
+		var col1 = document.createElement('td');
+		col1.innerHTML = key;
+		var col2 = document.createElement('td');
+		col2.innerHTML = debts[key][0];
+		var col3 = document.createElement('td');
+		col3.innerHTML = debts[key][1];
+		var col4 = document.createElement('td');
+		col4.innerHTML = debts[key][2];
+
+		col1.style = 'padding-left: 0;';
+		col2.style = 'padding-left: 0';
+		col3.style = 'padding-left: 0';
+		col4.style = 'padding-left: 0';
+	//	col1.className = 'no-left-padding';
+ 	//		col2.className = 'no-left-padding';
+
+		e.appendChild(col1);
+		e.appendChild(col2);
+		e.appendChild(col3);
+		e.appendChild(col4);
+
+		docFrag.appendChild(e);
+	}
+	document.getElementById('debts-table-tbody').appendChild(docFrag);
+
+	document.getElementById('debts-total').innerHTML = formatter.format(debtsTotal);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+
+	var billsResp = {
+		bills : {
+			'Home T&I':[195.38,1,'green','auto'],
+			'Mortgage':[357.30,1,'green','auto'],
+			'Car':[1750.00,1,'green','auto'],
+			'Car Insurance':[140.44,8,'green','auto'],
+			'Student Loans':[0.00,18,'unsure','manual'],
+			'Netflix':[8.99,17,'puppy','auto'],
+			'Hulu':[5.99,18,'green','auto'],
+			//need to dynamically generate purple carrot entries
+			'Purple Carrot 1':[71.94,'green','every Friday'],
+			'Purple Carrot 2':[71.94,8,'CC','every Friday'],
+			'Purple Carrot 3':[71.94,15,'CC','every Friday'],
+			'Purple Carrot 4':[71.94,22,'CC','every Friday'],
+			'Purple Carrot 5':[71.94,29,'CC','every Friday'],
+			'ATT':[69.99,17,'Credit Card --keeps getting pushed back a day','auto'],
+			'NIPSCO':[50.00,15,'puppy','manual'],
+			'AEP':[125.00,15,'puppy','manual'],
+			'Water':[90.00,15,'puppy','manual'],
+			'Care Payment':[51.00,15,'puppy','manual'],
+			'Synchrony':[41.00,1,'puppy','manual'],
+			'Metro PCS':[40.00,16,'puppy','auto'],
+			'Roth IRA':[200.00,15,'green','auto'],
+			'Google Fi':[55.00,26,'CC','auto'],
+			'Capital One':[40.00,22,'green','manual']
+		}
+	}
+
+	var debtsResp = {
+		debts : {
+			'mortgage':[60600,0.0525, 'June 2037'],
+			'car':[2168.75,0.1274, 'Jan 2021'],
+			'student loans':[64855.74,0.0475, 'May 2040'],
+			'capital one':[40.00,23.74, 'Jan 2021'],
+			'care payment':[863,0,'Jun 2022'],
+			'synchrony':[1258,'Dec 2025']
+
+		},
+		debtsTotal : 127664
+	}
+	//va = 142.29
+	//pay = 2577.01
+	var incomeResp = {
+		'check1':{'amount':2577.01, 'payday':1},
+		'check2':{'amount':2577.01, 'payday':15},
+		'VA':{'amount':142.29, 'payday':1}
+	}
+
+
+	populateBills(billsResp);
+	populateDebts(debtsResp);
+
+	document.getElementById('width').innerHTML = window.innerWidth;
+
+   /* your logic here */
+});
+
+</script>
+
+<div class="tile is-ancestor">
+  <div class="tile is-desktop is-vertical is-8">
+    <div class="tile">
+      <div class="tile is-parent">
+        <article class="tile is-child notification is-info">
+          <p class="title">Goal</p>
+          <p class="subtitle">Buy a cabin</p>
+          <figure class="image is-4by3">
+            <img src="img/cabin.jpeg">
+          </figure>
+        </article>
+      </div>
+      <div class="tile is-parent is-vertical">
+        <article class="tile is-child notification is-primary">
+	<p class="title">Income <span style='float:right'>$5386.23</span></p>
+          <p class="subtitle">Top tile</p>
+        </article>
+        <article class="tile is-child notification is-warning">
+	  <p class="title">Bills <span id='bills-total' style='float:right'></span></p>
+          <p class="subtitle"></p>
+          <table id='bills-table' class="table">
+		  <thead>
+			<tr>
+				<th onclick="" style='padding-left:0'>Biller</th>
+				<th onclick="" style='padding-left:0'>Amount</th>
+				<th onclick="" style='padding-left:0'>Due Day</th>
+				<th onclick="" style='padding-left:0'>Payment Account</th>
+				<th onclick="" style='padding-left:0'>Authorization Type</th>
+			</tr>
+		  </thead>
+		  <tbody id='bills-table-tbody'>
+		  </tbody>
+	  </table>
+        </article>
+      </div>
+    </div>
+    <div class="tile is-parent">
+      <article class="tile is-child notification is-danger">
+        <p class="title">Debts  <span id='debts-total' style='float:right'></span></p>
+        <p class="subtitle">Aligned with the right tile</p>
+	  prompts for did u pay your regularly scheduled payment?
+	  I paid more ___ I paid less ___
+	 Assumes  payments if no response?
+	  tied to hidden amortization schedule
+	  * Add currently paid off at date
+	  * show tip of how to calculate monthly mortage pmt - subract T&I from loan statemet.
+
+	<table id='debts-table' class="table">
+                  <thead>
+                        <tr>
+                                <th onclick="" style='padding-left:0; color:white;'>Money Sucker</th>
+                                <th onclick="" style='padding-left:0; color:white;'>Principle</th>
+                                <th onclick="" style='padding-left:0; color:white;'>Interest</th>
+                                <th onclick="" style='padding-left:0; color:white;'>Paid off Date (min payment)</th>
+                                <th onclick="" style='padding-left:0; color:white;'>Paid off Date (3 month trend)</th>
+                        </tr>
+                  </thead>
+                  <tbody id='debts-table-tbody'>
+                  </tbody>
+          </table>
+      </article>
+    </div>
+  </div>
+  <div class="tile is-parent">
+    <article class="tile is-child notification is-success">
+      <div class="content">
+      <p class="title">Variable Exp <span id='billsTotal' style='float:right;'></span></p>
+      <p class="subtitle">1st - 15th to Allocate <span id='billsTotalFirst'></span></p>
+        <div class="content">
+	      sort out CC stuff w/ debit stuff
+	  
+        </div>
+	<p class="subtitle">15th to 31st to Allocate <span id='billsTotalFifteenth'></span></p>
+        <div class="content">
+          <!-- Content -->
+	  $1600.00 to Ally
+	  
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+
+<!doctype html>
+  <header class="site-header">
+    <h1 class="title">Firebolt Finance</h1>
+    <nav class="site-nav">
+      <ul>
+      </ul>
+    </nav>
+    <button type="button" class="btn-menu"><span>Menu</span></button>
+    <!--a class="btn" href="/register.html">Register</a-->
+  </header>
+
+  <section class="home-about">
+    <div class="row column large-9 xlarge-6 xxlarge-4">
+    </div>
+
+    <div class="row column">
+      <div class="footer-legal">
+        &copy;Firebolt Finance<br>
+        All Rights Reserved
+      </div>
+    </div>
+  </footer>
+  <h1> ideas</h1>
+  <ul>
+  </ul>
+
+  moneys 
+  <script src="js/vendor.js"></script>
+  <script src="js/main.js"></script>
+<h1>Populate budget with current pay period bills. Have income be put on start date and frequency. show difference. allow other categories. reset budget on new pay period. huge backlog of notificatoins for missed payments.</h1>
+<h1>sqlite db to save data to android locally</h1>
+<h1>your next bill due in next 7 days. Insert paid paid paid by bills. open up and see what you owe for the rest of the month. See average pay on calendar and what you would have left.</h1>
+<h1>Demolish Debt. See your projected payoff dates as you make progress in real time with your actual activity not in theory.</h1>
+<h1>Does not use data or store your info in the cloud</h1>
+<h1>ensure this db cant be erased. Allow for CSV download...</h1>
+  <li>Holiday gift shopper. who are u shpping for? How much spending? Cut back 25% and put toward goal projection</li>
+	  <li>AI to see spending patterns...add 'human' elemnt'</li>
